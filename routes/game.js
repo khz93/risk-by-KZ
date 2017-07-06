@@ -10,34 +10,37 @@ router.get('/', function (req, res) {
   if (!req.session.user) {
     return res.redirect('../');
   };
-  Engine.findOne().lean().exec(function (err, turn) {
-    var user = req.session.user;
-    var ifnotturn = User.findOne({
-      '_id': turn.turn
-    }, function (err, ifnotturn) {
-      res.render('game', {
-        user: user._id,
-        turn: turn.turn,
-        ifnotturn: ifnotturn.color,
-        color: user.color
-      })
+  var user = req.session.user;
+  User.findById(user._id, function(err, user){
+    res.render('game', {
+      color: user.color,
+      lastthrow: new Date(user.lastthrow),
     })
   })
-});
+})
 
 
 router.post('/', function (req, res) {
   var user = req.session.user,
       userColor = user.color,
       atkdid = req.body['atkdid[]'],
-      los = Math.floor((Math.random() * 20) + 1)
+      los = Math.floor((Math.random() * 20) + 1),
+      time = new Date()
   if(typeof(atkdid)==="undefined"){var atkdid = ['0']};
 
 
   Hex.find({'color': userColor}, function(err, userHexes){
-    Engine.findById("593efd484d43218f3197065a", function (err, turn) {
-      jsonfile.readFile(datafile, function(err, obj){
-        Hex.findById(atkdid[0], function(err, atkdhexid){
+    jsonfile.readFile(datafile, function(err, obj){
+      Hex.findById(atkdid[0], function(err, atkdhexid){
+        User.findById(user._id, function(err, userid){
+
+          //TIME CHECK
+          var lastthrow = userid.lastthrow;
+          var timecheck = false;
+          var posttime = new Date();
+          if((posttime - lastthrow) > 8*3600*1000){
+            timecheck = true;
+          }
 
           //NGHBRS CHECK:
           var checked = false;
@@ -62,34 +65,34 @@ router.post('/', function (req, res) {
           }
           var jsonupdate = function jsonupdate(){
             jsonfile.writeFileSync(datafile, obj);
-            turnchange();
+            timeupdate();
           }
-          var turnchange = function(){
-            if(turn.turn == 5){
-              turn.turn = 1;
-            } else {
-              turn.turn += 1;
-            }
-            turn.save();
+
+          var timeupdate = function(){
+            userid.lastthrow = posttime;
+            userid.save();
             servrespond();
           }
+
           var servrespond = function(){
             req.flash("success", "WSZYSTKO OK, WYRZUCIŁEŚ:"+(los));
             res.send('done')
           }
           
           
-          if (user._id == turn.turn && atkdid.length == 20 && checked){
+          if (atkdid.length == 20 && checked && timecheck){
             dbchange();
 
           } else {
               req.flash("danger", "Coś poszło nie tak, spróbuj jeszcze raz...");
               res.send('err');
+        
           };
         });
       });
     });
   });
 });
+
 
 module.exports = router;

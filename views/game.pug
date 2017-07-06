@@ -132,16 +132,12 @@ html
     .navbar.navbar-default
       .container-fluid
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
-        if user == turn 
           .navbar-form.navbar-left
-            p.navbar-text Zaznacz 20 pól wokół swoich ziem, a nastepnie wciśnij
+            p.navbar-text Zaznacz 20 pól wokół swoich ziem, a nastepnie wciśnij 
             |             
             .form-group       
             |             
-            button.btn.btn-default.navbar-left#submit(style="margin-top:5px") Rzut 
-        else
-          p.navbar-form.navbar-left.navbar-text Teraz jest tura 
-          h1(style='color:' + ifnotturn) #{ifnotturn}
+            button.btn.btn-default.navbar-left#submit(style="margin-top:5px") Rzut
         != messages('message', locals)
 
 
@@ -151,6 +147,25 @@ html
 
   |   
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")
+  script.
+    document.getElementById("submit").disabled = true;
+    var x = setInterval(function() {
+        var a = new Date()
+        var c = new Date(!{JSON.stringify(lastthrow)})
+        var distance = (8*3600*1000) - (a-c)
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        document.getElementById("submit").innerHTML = hours + ":" + minutes + ":" + seconds;
+        if (distance < 0) {
+          clearInterval(x);
+          document.getElementById("submit").innerHTML = "Rzut";
+          document.getElementById("submit").disabled = false;
+        }
+    },1000)
+  script.
+    var a = !{JSON.stringify(time)};
+    console.log(a)
   script.
     $('#submit').click(function() {
       $('#loadingmessage').show();
