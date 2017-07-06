@@ -1,0 +1,183 @@
+doctype html
+html
+  head
+    title Your basic web app structure
+    |     
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+    |     
+    style(type="text/css").
+      .hexfield {
+      fill: transparent;
+      stroke: black;
+      stroke-width: 2
+      }
+      .hexfield:focus {
+      outline:none
+      }
+      .hexfield:hover {
+      fill: red
+      }
+      .hexfield:active {
+      fill: maroon;
+      outline: none
+      }
+      .hexfield.clicked{
+      fill: maroon
+      }
+      .green {
+      fill: green
+      }
+      .orange {
+      fill: orange
+      }
+      .white {
+      fill: white
+      }
+      .pink {
+      fill: pink
+      }
+      .purple {
+      fill: purple
+      }
+      .blue {
+      fill: blue
+      }
+      .bar {
+        width: 100%;
+        height: 20px;
+        border: 1px solid #2980b9;
+        border-radius: 3px;
+        background-image: 
+          repeating-linear-gradient(
+            -45deg,
+            #2980b9,
+            #2980b9 11px,
+            #eee 10px,
+            #eee 20px /* determines size */
+          );
+        background-size: 28px 28px;
+        animation: move .5s linear infinite;
+      }
+
+      @keyframes move {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 28px 0;
+        }
+      }
+    |     
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js", integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=", crossorigin="anonymous")
+    |     
+    script(src="/javascripts/hexgridwidget.js")
+    |   
+    script.
+      $.ajax({
+      cache: false,
+      url: "javascripts/data.json",
+      dataType: "json",
+      success: function (hexy) {
+        var rebuild = function () {
+          window.atkdid = [];
+          var
+            radius = 20,
+            columns = 50,
+            rows = 18,
+            cssClass = 'hexfield',
+            color = !{JSON.stringify(color)},
+            clicks = 0,
+            atkd = [],
+            ownd = [],
+            owndid = []
+          $('#container').empty().hexGridWidget(radius, columns, rows, cssClass, hexy).on('hexclick');
+          for(var i = 0; i<900; i++){
+            if(($('#'+i).data('color') == color)){
+              ownd.push($('#'+i).data('coords'))
+              owndid.push($('#'+i).data('_id'))
+
+            };
+          };
+          //click
+          $('#container .hexfield').click(function(){
+            var nghbrs = $(this).data('nghbrs'),
+              check = false
+            for(var j = 0; j < nghbrs.length; j++){
+              for(var i = 0; i < ownd.length; i++){
+                if(ownd[i][0] == nghbrs[j][0] && ownd[i][1] == nghbrs[j][1]){
+                  check = true;
+                };
+              };
+              for(var i = 0; i < atkd.length; i++){
+                if(atkd[i][0] == nghbrs[j][0] && atkd[i][1] == nghbrs[j][1]){
+                  check = true;
+                };
+              };
+            };
+            if (check && clicks < 20 && !(owndid.includes($(this).data('_id')) || window.atkdid.includes($(this).data('_id')))){
+              window.atkdid.push($(this).data('_id'));
+              atkd.push($(this).data('coords'));
+              this.classList.toggle('clicked');
+              clicks++;
+            };
+          })
+        }
+        $('#rebuild').click(rebuild);
+        rebuild();
+      }
+      })
+  |
+  body
+    .bar#loadingmessage(style='display:none')
+    .navbar.navbar-default
+      .container-fluid
+        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+        if user == turn 
+          .navbar-form.navbar-left
+            p.navbar-text Zaznacz 20 pól wokół swoich ziem, a nastepnie wciśnij
+            |             
+            .form-group       
+            |             
+            button.btn.btn-default.navbar-left#submit(style="margin-top:5px") Rzut 
+        else
+          p.navbar-form.navbar-left.navbar-text Teraz jest tura 
+          h1(style='color:' + ifnotturn) #{ifnotturn}
+        != messages('message', locals)
+
+
+    |     
+    #container
+    |     
+
+  |   
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")
+  script.
+    $('#submit').click(function() {
+      $('#loadingmessage').show();
+      console.log('click')
+      $.ajax({
+        url: 'game',
+        type: 'POST',
+        data: {'atkdid': window.atkdid},
+        success: function(data){
+          if(data=="done"){
+            setTimeout(window.location.reload.bind(window.location), 1000);
+            function hider(){
+              $('#loadingmessage').hide();
+            }
+          } else if (data=="err"){
+            setTimeout(window.location.reload.bind(window.location), 1000);
+            function hider(){
+              $('#loadingmessage').hide();
+            }
+          }
+
+        },
+        error: function(){
+          setTimeout(window.location.reload.bind(window.location), 1000);
+            function hider(){
+              $('#loadingmessage').hide();
+            }
+        }
+      }); 
+    })
