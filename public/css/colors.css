@@ -1,0 +1,118 @@
+.hexfield {
+fill: transparent;
+stroke: black;
+stroke-width: 2
+}
+.hexfield:focus {
+outline:none
+}
+
+.hexfield:active {
+fill: maroon;
+outline: none
+}
+.hexfield.clicked{
+fill: maroon
+}
+.white {
+fill: white
+}
+
+.Cff4000 {
+    fill: #ff4000
+}
+.Cff8000{
+    fill: #ff8000
+}
+.Cffbf00 {
+    fill: #ffbf00
+}
+.Cffff00{
+    fill: #ffff00
+}
+.Cbfff00 {
+    fill: #bfff00
+}
+.C80ff00{
+    fill: #80ff00
+}
+.C40ff00 {
+    fill: #40ff00
+}
+.C00ff00{
+    fill: #00ff00
+}
+.C00ff40{
+    fill: #00ff40
+}
+.C00ff80 {
+    fill: #00ff80
+}
+.C00ffbf{
+    fill: #00ffbf
+}
+.C00ffff {
+    fill: #00ffff
+}
+.C00bfff{
+    fill: #00bfff
+}
+.C0080ff{
+    fill: #0080ff
+}
+.C0040ff{
+    fill: #0040ff
+}
+.C0000ff{
+    fill: #0000ff
+}
+.C4000ff{
+    fill: #4000ff
+}
+.C8000ff{
+    fill: #8000ff
+}
+.Cbf00ff{
+    fill: #bf00ff
+}
+.Cff00ff{
+    fill: #ff00ff
+}
+.Cff00bf{
+    fill: #ff00bf
+}
+.Cff0080{
+    fill: #ff0080
+}
+.C0040ff{
+    fill: #ff0040
+}
+
+
+
+
+.bar {
+width: 100%;
+height: 20px;
+border: 1px solid #2980b9;
+border-radius: 3px;
+background-image: 
+    repeating-linear-gradient(
+    -45deg,
+    #2980b9,
+    #2980b9 11px,
+    #eee 10px,
+    #eee 20px /* determines size */
+    );
+background-size: 28px 28px;
+animation: move .5s linear infinite;
+}
+
+@keyframes move {
+0% {
+    background-position: 0 0;
+}
+100% {
+    background-position: 28px 0;
+}
+}

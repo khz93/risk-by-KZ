@@ -8,9 +8,9 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function (req, res) {
-  var username = req.body.username;
+  var loginname = req.body.username;
   User.findOne({
-    username: username
+    loginname: loginname
     }, function (err, user) {
     if (err) {
       console.log(err);

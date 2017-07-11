@@ -1,5 +1,5 @@
 /*global $, document*/
-$.fn.hexGridWidget = function (radius, columns, rows, cssClass, hexy) {
+$.fn.hexGridWidget = function (radius, columns, rows, cssClass, hexy, userHover) {
 	'use strict';
 	var createSVG = function (tag) {
 		return $(document.createElementNS('http://www.w3.org/2000/svg', tag || 'svg'));
@@ -48,8 +48,16 @@ $.fn.hexGridWidget = function (radius, columns, rows, cssClass, hexy) {
 						color: color,
 						coords: coords,
 						nghbrs: nghbrs,
+						owner: userHover[color]
 					})
-					.on('click', hexClick);
+					.on('click', hexClick)
+					.hover(function(event){
+						$('#popup').text($(this).data('owner'))
+						$('#popup').css({"position":"absolute","left":event.clientX ,"top":event.clientY }).show()
+					}, function(){
+						$('#popup').text('')
+						$('#popup').hide();
+					})
 				iter++;
 			}
 		}

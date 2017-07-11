@@ -11,12 +11,21 @@ router.get('/', function (req, res) {
     return res.redirect('../');
   };
   var user = req.session.user;
-  User.findById(user._id, function(err, user){
-    res.render('game', {
-      color: user.color,
-      lastthrow: new Date(user.lastthrow),
+
+  User.find({}, function(err, allUsers){
+    User.findById(user._id, function(err, user){
+      var usersHover = {};
+      for(var i = 0; i < allUsers.length; i++){
+        usersHover[allUsers[i].color] = allUsers[i].username
+      }
+      res.render('game', {
+        allUsers: usersHover,
+        color: user.color,
+        lastthrow: new Date(user.lastthrow),
+      })
     })
   })
+
 })
 
 
@@ -24,7 +33,7 @@ router.post('/', function (req, res) {
   var user = req.session.user,
       userColor = user.color,
       atkdid = req.body['atkdid[]'],
-      los = Math.floor((Math.random() * 20) + 1),
+      los = Math.floor((Math.random() * 6) + 1),
       time = new Date()
   if(typeof(atkdid)==="undefined"){var atkdid = ['0']};
 
@@ -80,7 +89,7 @@ router.post('/', function (req, res) {
           }
           
           
-          if (atkdid.length == 20 && checked && timecheck){
+          if (atkdid.length == 6 && checked && timecheck){
             dbchange();
 
           } else {

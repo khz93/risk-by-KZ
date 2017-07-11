@@ -5,73 +5,19 @@ html
     |     
     link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
     |     
-    style(type="text/css").
-      .hexfield {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 2
-      }
-      .hexfield:focus {
-      outline:none
-      }
-      .hexfield:hover {
-      fill: red
-      }
-      .hexfield:active {
-      fill: maroon;
-      outline: none
-      }
-      .hexfield.clicked{
-      fill: maroon
-      }
-      .green {
-      fill: green
-      }
-      .orange {
-      fill: orange
-      }
-      .white {
-      fill: white
-      }
-      .pink {
-      fill: pink
-      }
-      .purple {
-      fill: purple
-      }
-      .blue {
-      fill: blue
-      }
-      .bar {
-        width: 100%;
-        height: 20px;
-        border: 1px solid #2980b9;
-        border-radius: 3px;
-        background-image: 
-          repeating-linear-gradient(
-            -45deg,
-            #2980b9,
-            #2980b9 11px,
-            #eee 10px,
-            #eee 20px /* determines size */
-          );
-        background-size: 28px 28px;
-        animation: move .5s linear infinite;
-      }
-
-      @keyframes move {
-        0% {
-          background-position: 0 0;
-        }
-        100% {
-          background-position: 28px 0;
-        }
-      }
+    link(href='/css/colors.css', rel='stylesheet') 
     |     
+
+    script.
+      var sheet = document.styleSheets[0];
+      var color = !{JSON.stringify(color)};
+      color = "#"+color.slice(1,10);
+      sheet.insertRule(".hexfield:hover {fill:"+color+"}", 1);
     script(src="https://code.jquery.com/jquery-3.2.1.min.js", integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=", crossorigin="anonymous")
     |     
     script(src="/javascripts/hexgridwidget.js")
     |   
+
     script.
       $.ajax({
       cache: false,
@@ -86,11 +32,12 @@ html
             rows = 18,
             cssClass = 'hexfield',
             color = !{JSON.stringify(color)},
+            userHover = !{JSON.stringify(allUsers)},
             clicks = 0,
             atkd = [],
             ownd = [],
             owndid = []
-          $('#container').empty().hexGridWidget(radius, columns, rows, cssClass, hexy).on('hexclick');
+          $('#container').empty().hexGridWidget(radius, columns, rows, cssClass, hexy, userHover).on('hexclick');
           for(var i = 0; i<900; i++){
             if(($('#'+i).data('color') == color)){
               ownd.push($('#'+i).data('coords'))
@@ -114,7 +61,7 @@ html
                 };
               };
             };
-            if (check && clicks < 20 && !(owndid.includes($(this).data('_id')) || window.atkdid.includes($(this).data('_id')))){
+            if (check && clicks < 6 && !(owndid.includes($(this).data('_id')) || window.atkdid.includes($(this).data('_id')))){
               window.atkdid.push($(this).data('_id'));
               atkd.push($(this).data('coords'));
               this.classList.toggle('clicked');
@@ -127,13 +74,15 @@ html
       }
       })
   |
+
   body
+    #popup(style="display: none") 
     .bar#loadingmessage(style='display:none')
     .navbar.navbar-default
       .container-fluid
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           .navbar-form.navbar-left
-            p.navbar-text Zaznacz 20 pól wokół swoich ziem, a nastepnie wciśnij 
+            p.navbar-text Zaznacz 6 pól wokół swoich ziem, a nastepnie wciśnij 
             |             
             .form-group       
             |             
@@ -164,12 +113,8 @@ html
         }
     },1000)
   script.
-    var a = !{JSON.stringify(time)};
-    console.log(a)
-  script.
     $('#submit').click(function() {
       $('#loadingmessage').show();
-      console.log('click')
       $.ajax({
         url: 'game',
         type: 'POST',
